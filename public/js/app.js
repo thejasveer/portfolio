@@ -18004,9 +18004,9 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
     return {
       renderArray: [],
       baseArray: [],
-      noOfBars: 50,
-      SECONDARY_COLOR: "red",
-      PRIMARY_COLOR: "turquoise",
+      noOfBars: 100,
+      SECONDARY_COLOR: "white",
+      PRIMARY_COLOR: "rgba(236, 72, 153)",
       ANIMATION_SPEED_MS: 1,
       IS_SORTING: false,
       SORTED_COLOR: "yellow"
@@ -18254,18 +18254,120 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.esm-bundler.js");
 
 var _hoisted_1 = {
-  "class": "array-container"
+  "class": "flex justify-center item-center mt-20"
 };
 var _hoisted_2 = {
-  "class": "actions"
+  "class": "w-full ml-50 p-20"
 };
+var _hoisted_3 = {
+  "class": ""
+};
+var _hoisted_4 = {
+  "class": "w-full flex flex-col justify-center items-center text-white"
+};
+
+var _hoisted_5 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("svg", {
+  xmlns: "http://www.w3.org/2000/svg",
+  "class": "h-6 w-6",
+  fill: "none",
+  viewBox: "0 0 24 24",
+  stroke: "currentColor"
+}, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("path", {
+  "stroke-linecap": "round",
+  "stroke-linejoin": "round",
+  "stroke-width": "2",
+  d: "M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+})], -1
+/* HOISTED */
+);
+
+var _hoisted_6 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("span", null, "Reset", -1
+/* HOISTED */
+);
+
+var _hoisted_7 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("svg", {
+  xmlns: "http://www.w3.org/2000/svg",
+  "class": "h-6 w-6",
+  fill: "none",
+  viewBox: "0 0 24 24",
+  stroke: "currentColor"
+}, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("path", {
+  "stroke-linecap": "round",
+  "stroke-linejoin": "round",
+  "stroke-width": "2",
+  d: "M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+})], -1
+/* HOISTED */
+);
+
+var _hoisted_8 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("span", null, "Merge Sort", -1
+/* HOISTED */
+);
+
+var _hoisted_9 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("svg", {
+  xmlns: "http://www.w3.org/2000/svg",
+  "class": "h-6 w-6",
+  fill: "none",
+  viewBox: "0 0 24 24",
+  stroke: "currentColor"
+}, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("path", {
+  "stroke-linecap": "round",
+  "stroke-linejoin": "round",
+  "stroke-width": "2",
+  d: "M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+})], -1
+/* HOISTED */
+);
+
+var _hoisted_10 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("span", null, " Bubble Sort", -1
+/* HOISTED */
+);
+
+var _hoisted_11 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("svg", {
+  xmlns: "http://www.w3.org/2000/svg",
+  "class": "h-6 w-6",
+  fill: "none",
+  viewBox: "0 0 24 24",
+  stroke: "currentColor"
+}, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("path", {
+  "stroke-linecap": "round",
+  "stroke-linejoin": "round",
+  "stroke-width": "2",
+  d: "M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+})], -1
+/* HOISTED */
+);
+
+var _hoisted_12 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("span", null, " Insertion Sort", -1
+/* HOISTED */
+);
+
+var _hoisted_13 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("svg", {
+  xmlns: "http://www.w3.org/2000/svg",
+  "class": "h-6 w-6",
+  fill: "none",
+  viewBox: "0 0 24 24",
+  stroke: "currentColor"
+}, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("path", {
+  "stroke-linecap": "round",
+  "stroke-linejoin": "round",
+  "stroke-width": "2",
+  d: "M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+})], -1
+/* HOISTED */
+);
+
+var _hoisted_14 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("span", null, " Selection Sort", -1
+/* HOISTED */
+);
+
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _this = this;
 
-  return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)("div", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_1, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.baseArray, function (height, id) {
+  return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)("div", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_2, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_3, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.baseArray, function (height, id) {
     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)("div", {
       key: id,
-      "class": "array-bar",
+      "class": "array-bar mx-auto",
       style: {
         height: height + 'px',
         backgroundColor: _this.PRIMARY_COLOR
@@ -18275,32 +18377,37 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     );
   }), 128
   /* KEYED_FRAGMENT */
-  ))]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_2, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("button", {
-    type: "button",
+  ))])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_4, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("button", {
+    type: "button ",
+    "class": "flex gap-2 text-pink-500 bg-transparent\n      border border-solid border-pink-500 hover:bg-pink-500 hover:text-white\n      active:bg-pink-600 font-bold uppercase px-8 py-3 rounded outline-none\n      focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150",
     onClick: _cache[1] || (_cache[1] = function () {
       return $options.resetArray && $options.resetArray.apply($options, arguments);
     })
-  }, "Reset Array"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("button", {
+  }, [_hoisted_5, _hoisted_6]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("button", {
     type: "button",
+    "class": "flex gap-2 text-pink-500 bg-transparent\n      border border-solid border-pink-500 hover:bg-pink-500 hover:text-white\n      active:bg-pink-600 font-bold uppercase px-8 py-3 rounded outline-none\n      focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150",
     onClick: _cache[2] || (_cache[2] = function () {
       return $options.mergeSort && $options.mergeSort.apply($options, arguments);
     })
-  }, "Merge Sort"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("button", {
+  }, [_hoisted_7, _hoisted_8]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("button", {
     type: "button",
+    "class": "flex gap-2 text-pink-500 bg-transparent\n      border border-solid border-pink-500 hover:bg-pink-500 hover:text-white\n      active:bg-pink-600 font-bold uppercase px-8 py-3 rounded outline-none\n      focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150",
     onClick: _cache[3] || (_cache[3] = function () {
       return $options.bubbleSort && $options.bubbleSort.apply($options, arguments);
     })
-  }, "Bubble Sort"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("button", {
+  }, [_hoisted_9, _hoisted_10]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("button", {
     type: "button",
     onClick: _cache[4] || (_cache[4] = function () {
       return $options.insertionSort && $options.insertionSort.apply($options, arguments);
-    })
-  }, "Insertion Sort"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("button", {
+    }),
+    "class": "flex gap-2 text-pink-500 bg-transparent\n      border border-solid border-pink-500 hover:bg-pink-500 hover:text-white\n      active:bg-pink-600 font-bold uppercase px-8 py-3 rounded outline-none\n      focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
+  }, [_hoisted_11, _hoisted_12]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("button", {
     type: "button",
     onClick: _cache[5] || (_cache[5] = function () {
       return $options.selectionSort && $options.selectionSort.apply($options, arguments);
-    })
-  }, "Selection Sort")])]);
+    }),
+    "class": "flex gap-2 text-pink-500 bg-transparent\n      border border-solid border-pink-500 hover:bg-pink-500 hover:text-white\n      active:bg-pink-600 font-bold uppercase px-8 py-3 rounded outline-none\n      focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
+  }, [_hoisted_13, _hoisted_14])])]);
 }
 
 /***/ }),
@@ -18618,7 +18725,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.array-container {\n  position: absolute;\n  left: 100px;\n  /* top: 100px; */\n}\n.array-bar {\n  width: 2px;\n  display: inline-block;\n  margin: 0 1px;\n}\n.actions {\n  position: relative;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.array-container {\n  position: absolute;\n  left: 100px;\n  /* top: 100px; */\n}\n.array-bar {\n  width:4px;\n  display: inline-block;\n  margin: 0 1px;\n}\n.actions {\n  position: relative;\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 

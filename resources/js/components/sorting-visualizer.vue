@@ -1,19 +1,64 @@
 <template>
-  <div>
-    <div class="array-container">
+  <div class="flex justify-center item-center mt-20">
+
+   <div class="w-full ml-50 p-20">
+       <div class="">
       <div
         v-for="(height, id) of baseArray"
         :key="id"
-        class="array-bar"
+        class="array-bar mx-auto"
         :style="{ height: height + 'px', backgroundColor: this.PRIMARY_COLOR }"
       ></div>
     </div>
-    <div class="actions">
-      <button type="button" @click="resetArray">Reset Array</button>
-      <button type="button" @click="mergeSort">Merge Sort</button>
-      <button type="button" @click="bubbleSort">Bubble Sort</button>
-      <button type="button" @click="insertionSort">Insertion Sort</button>
-      <button type="button" @click="selectionSort">Selection Sort</button>
+   </div>
+    <div class="w-full flex flex-col justify-center items-center text-white">
+      <button type="button " class="flex gap-2 text-pink-500 bg-transparent
+      border border-solid border-pink-500 hover:bg-pink-500 hover:text-white
+      active:bg-pink-600 font-bold uppercase px-8 py-3 rounded outline-none
+      focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150" @click="resetArray">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+          </svg><span>Reset</span>
+         </button>
+      <button type="button" class="flex gap-2 text-pink-500 bg-transparent
+      border border-solid border-pink-500 hover:bg-pink-500 hover:text-white
+      active:bg-pink-600 font-bold uppercase px-8 py-3 rounded outline-none
+      focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150" @click="mergeSort">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+          </svg><span>Merge Sort</span>
+          </button>
+      <button type="button"
+              class="flex gap-2 text-pink-500 bg-transparent
+      border border-solid border-pink-500 hover:bg-pink-500 hover:text-white
+      active:bg-pink-600 font-bold uppercase px-8 py-3 rounded outline-none
+      focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
+              @click="bubbleSort">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+          </svg><span> Bubble Sort</span>
+
+
+         </button>
+      <button type="button" @click="insertionSort"
+              class="flex gap-2 text-pink-500 bg-transparent
+      border border-solid border-pink-500 hover:bg-pink-500 hover:text-white
+      active:bg-pink-600 font-bold uppercase px-8 py-3 rounded outline-none
+      focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
+      >
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+          </svg><span> Insertion Sort</span>
+      </button>
+      <button type="button" @click="selectionSort"
+              class="flex gap-2 text-pink-500 bg-transparent
+      border border-solid border-pink-500 hover:bg-pink-500 hover:text-white
+      active:bg-pink-600 font-bold uppercase px-8 py-3 rounded outline-none
+      focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150" >
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+          </svg><span> Selection Sort</span>
+      </button>
     </div>
   </div>
 </template>
@@ -27,9 +72,9 @@ export default {
       return {
       renderArray: [],
       baseArray: [],
-      noOfBars: 50,
-      SECONDARY_COLOR: "red",
-      PRIMARY_COLOR: "turquoise",
+      noOfBars:100,
+      SECONDARY_COLOR: "white",
+      PRIMARY_COLOR: "rgba(236, 72, 153)",
       ANIMATION_SPEED_MS: 1,
       IS_SORTING: false,
       SORTED_COLOR: "yellow",
@@ -184,7 +229,7 @@ export default {
   /* top: 100px; */
 }
 .array-bar {
-  width: 2px;
+  width:4px;
   display: inline-block;
   margin: 0 1px;
 }
