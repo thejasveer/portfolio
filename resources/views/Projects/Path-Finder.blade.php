@@ -1,4 +1,4 @@
 @extends('layouts.base')
 @section('content')
-    <parent type="SortingVisualizer"/>
+    <parent type="pathFinder" />
 @stop

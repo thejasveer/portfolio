@@ -27,9 +27,10 @@
 
 <div id="app">
     @yield('content')
-    <div class="relative flex items-top justify-center min-h-screen bg-gray-100 sm:items-center py-4 sm:pt-0">
+    <div class="relative flex flex-col items-top justify-center min-h-screen bg-gray-100 sm:items-center py-4 sm:pt-0">
 
-        <a href="/sorting-visualizer">Soring Visulaizer</a>
+        <a href="/sorting-visualizer">Sorting Visulaizer</a>
+        <a href="/path-finder">Path Finder</a>
 
 
     </div>
@@ -38,9 +39,4 @@
 </body>
 
 </html>
-<script>
-    import SortingVisualizer from "../../js/components/sorting-visualizer";
-    export default {
-        components: {SortingVisualizer}
-    }
-</script>
+

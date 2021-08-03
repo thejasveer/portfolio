@@ -17,3 +17,4 @@ Route::get('/', function () {
     return view('layouts.base');
 });
 Route::get('/sorting-visualizer',[\App\Http\Controllers\ProjectController::class,'sortingVisualizer']);
+Route::get('/path-finder',[\App\Http\Controllers\ProjectController::class,'pathFinder']);

@@ -9,4 +9,7 @@ class ProjectController extends Controller
     public function     sortingVisualizer(){
         return view('Projects.Sorting-Visualizer');
     }
+    public function     pathFinder(){
+        return view('Projects.Path-Finder');
+    }
 }
