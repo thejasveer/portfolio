@@ -99,25 +99,28 @@ export default {
       const animations = Algorithms.mergeSort(this.renderArray);
 
       for (let i = 0; i < animations.length; i++) {
-        const arrayBars = document.getElementsByClassName("array-bar");
-        const isColorChange = i % 3 !== 2;
 
+          setTimeout(() => {
+              const arrayBars = document.getElementsByClassName("array-bar");
+              const isColorChange = i % 3 !== 2;
         if (isColorChange) {
+
           const [barOneIdx, barTwoIdx] = animations[i];
           const barOneStyle = arrayBars[barOneIdx].style;
           const barTwoStyle = arrayBars[barTwoIdx].style;
           const color = i % 3 === 0 ? this.SECONDARY_COLOR : this.PRIMARY_COLOR;
-          setTimeout(() => {
+
             barOneStyle.backgroundColor = color;
             barTwoStyle.backgroundColor = color;
-          }, i * this.ANIMATION_SPEED_MS);
+          // }, this.ANIMATION_SPEED_MS * i  );
         } else {
-          setTimeout(() => {
+          // setTimeout(() => {
             const [barOneIdx, newHeight] = animations[i];
             const barOneStyle = arrayBars[barOneIdx].style;
             barOneStyle.height = `${newHeight}px`;
-          }, i * this.ANIMATION_SPEED_MS);
+
         }
+        }, this.ANIMATION_SPEED_MS * i  );
       }
     },
     bubbleSort() {

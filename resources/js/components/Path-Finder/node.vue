@@ -1,5 +1,11 @@
 <template>
-<h1>1</h1>
+    <div
+     class="h-full w-full"
+    >
+        <div :class="extraClassName" draggable="true" class="h-full w-full "> </div>
+
+    </div>
+
 
 </template>
 
@@ -8,21 +14,30 @@
         name: "node",
         props:
             {
-                idx:Number,
+                value:Object,
+                isStart:Boolean,
+                isFinish:Boolean,
             }
-       ,
+        ,
 
         components:{
 
         },
         data() {
             return {
-            // nodesArray:this.tableNodes
+                // nodesArray:this.tableNodes
             };
         },
         watch: {},
         computed: {
-
+            extraClassName()
+            {
+                const {isStart,isFinish} = this.value;
+                console.log(isStart)
+           const cn = (isFinish== true) ? 'endCls': (isStart == true) ? 'startCls' : '';
+           console.log(cn)
+           return cn;
+            }
         },
 
         methods: {
@@ -35,5 +50,14 @@
 </script>
 
 <style scoped>
-
+.startCls{
+    background-color: greenyellow;
+    color: yellow;
+    cursor: grabbing;
+}
+.endCls{
+    background-color: red;
+    color: yellow;
+    cursor: grabbing;
+}
 </style>
