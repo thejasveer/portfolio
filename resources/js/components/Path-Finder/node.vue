@@ -10,7 +10,7 @@
       <svg
         v-if="isStart"
         xmlns="http://www.w3.org/2000/svg"
-        class="h-10 w-10"
+        class="h-10 w-10 animate-pulse"
         viewBox="0 0 20 20"
         fill="currentColor"
       >
@@ -23,7 +23,7 @@
       <svg
         v-if="isFinish"
         xmlns="http://www.w3.org/2000/svg"
-        class="h-10 w-10"
+        class="h-10 w-10 animate-pulse"
         viewBox="0 0 20 20"
         fill="currentColor"
       >

@@ -18458,7 +18458,7 @@ var _hoisted_1 = {
 var _hoisted_2 = {
   key: 0,
   xmlns: "http://www.w3.org/2000/svg",
-  "class": "h-10 w-10",
+  "class": "h-10 w-10 animate-pulse",
   viewBox: "0 0 20 20",
   fill: "currentColor"
 };
@@ -18474,7 +18474,7 @@ var _hoisted_3 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("
 var _hoisted_4 = {
   key: 1,
   xmlns: "http://www.w3.org/2000/svg",
-  "class": "h-10 w-10",
+  "class": "h-10 w-10 animate-pulse",
   viewBox: "0 0 20 20",
   fill: "currentColor"
 };
