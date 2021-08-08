@@ -17973,11 +17973,19 @@ __webpack_require__.r(__webpack_exports__);
     extraClassName: function extraClassName() {
       var _this$value = this.value,
           isStart = _this$value.isStart,
-          isFinish = _this$value.isFinish;
-      console.log(isStart);
-      var cn = isFinish == true ? 'endCls' : isStart == true ? 'startCls' : '';
-      console.log(cn);
+          isFinish = _this$value.isFinish,
+          isWall = _this$value.isWall;
+      var cn = isFinish == true ? "endCls" : isStart == true ? "startCls" : isWall == true ? "wall" : "";
       return cn;
+    },
+    onMouseEnter: function onMouseEnter() {
+      this.$emit("onMouseEnter", this.value);
+    },
+    onMouseUp: function onMouseUp() {
+      this.$emit("onMouseUp", this.value);
+    },
+    onMouseDown: function onMouseDown() {
+      this.$emit("onMouseDown", this.value);
     }
   },
   methods: {},
@@ -18000,6 +18008,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var util__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! util */ "./node_modules/util/util.js");
 /* harmony import */ var util__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(util__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _node__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./node */ "./resources/js/components/Path-Finder/node.vue");
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) { symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); } keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
@@ -18012,30 +18026,34 @@ __webpack_require__.r(__webpack_exports__);
     return {
       tableCol: 25,
       tableRow: 15,
-      nodes: [],
+      grid: [],
       startNode: {
-        row: 2,
-        col: 23
+        row: 8,
+        col: 3
       },
       endNode: {
         row: 8,
-        col: 3
-      }
+        col: 20
+      },
+      mouseIsPressed: false,
+      movingNodes: false,
+      movingNodeType: "",
+      changeNode: false
     };
   },
   watch: {},
   computed: {},
   methods: {
     makeTable: function makeTable() {
-      for (var row = 1; row <= this.tableRow; row++) {
+      for (var row = 0; row < this.tableRow; row++) {
         var currentRow = [];
 
-        for (var col = 1; col <= this.tableCol; col++) {
+        for (var col = 0; col < this.tableCol; col++) {
           var currentNode = this.createNode(row, col);
           currentRow.push(currentNode);
         }
 
-        this.nodes.push(currentRow);
+        this.grid.push(currentRow);
       }
     },
     createNode: function createNode(row, col) {
@@ -18049,6 +18067,88 @@ __webpack_require__.r(__webpack_exports__);
         isWall: false,
         previousNode: null
       };
+    },
+    getNewGridWithWallToggled: function getNewGridWithWallToggled(grid, values) {
+      var newGrid = grid.slice();
+      var node = newGrid[values.row][values.col];
+
+      if (!this.movingNodes) {
+        var newNode = _objectSpread(_objectSpread({}, node), {}, {
+          isWall: !node.isWall
+        });
+
+        newGrid[values.row][values.col] = newNode;
+      } else {
+        if (this.movingNodeType == "startNode") {
+          var _newNode = _objectSpread(_objectSpread({}, node), {}, {
+            isStart: true
+          });
+
+          if (this.changeNode) {
+            var prvNode = newGrid[this.previousNode.row][this.previousNode.col];
+
+            var prvNodeUpdate = _objectSpread(_objectSpread({}, prvNode), {}, {
+              isStart: !prvNode.isStart //   isWall: false,
+
+            });
+
+            newGrid[this.previousNode.row][this.previousNode.col] = prvNodeUpdate;
+            this.previousNode = values;
+            this.startNode = _newNode;
+          }
+
+          newGrid[values.row][values.col] = _newNode;
+        } else {
+          var _newNode2 = _objectSpread(_objectSpread({}, node), {}, {
+            isFinish: true
+          });
+
+          if (this.changeNode) {
+            var _prvNode = newGrid[this.previousNode.row][this.previousNode.col];
+
+            var _prvNodeUpdate = _objectSpread(_objectSpread({}, _prvNode), {}, {
+              isFinish: !_prvNode.isFinish //   isWall:(prvNode.isWall) ?  false ,
+
+            });
+
+            newGrid[this.previousNode.row][this.previousNode.col] = _prvNodeUpdate;
+            this.previousNode = values;
+            this.endNode = _newNode2;
+          }
+
+          newGrid[values.row][values.col] = _newNode2;
+        }
+      }
+
+      return newGrid;
+    },
+    handleMouseEnter: function handleMouseEnter(values) {
+      if (!this.mouseIsPressed) return;
+
+      if (this.previousNode) {
+        this.changeNode = true;
+      }
+
+      var newGrid = this.getNewGridWithWallToggled(this.grid, values);
+      this.grid = newGrid;
+    },
+    handleMouseDown: function handleMouseDown(values) {
+      //   debugger;
+      this.mouseIsPressed = true;
+
+      if (this.startNode.row == values.row && this.startNode.col == values.col || this.endNode.row == values.row && this.endNode.col == values.col) {
+        this.movingNodeType = this.startNode.row == values.row && this.startNode.col == values.col ? "startNode" : "endNode";
+        this.movingNodes = true;
+        this.previousNode = values;
+      }
+
+      var newGrid = this.getNewGridWithWallToggled(this.grid, values);
+      this.grid = newGrid;
+    },
+    handleMouseUp: function handleMouseUp(values) {
+      this.mouseIsPressed = false;
+      this.movingNodes = false;
+      this.previousNode = null;
     }
   },
   mounted: function mounted() {
@@ -18355,15 +18455,54 @@ var _withId = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.withScopeId)("dat
 var _hoisted_1 = {
   "class": "h-full w-full"
 };
+var _hoisted_2 = {
+  key: 0,
+  xmlns: "http://www.w3.org/2000/svg",
+  "class": "h-10 w-10",
+  viewBox: "0 0 20 20",
+  fill: "currentColor"
+};
+
+var _hoisted_3 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("path", {
+  "fill-rule": "evenodd",
+  d: "M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-8.707l-3-3a1 1 0 00-1.414 1.414L10.586 9H7a1 1 0 100 2h3.586l-1.293 1.293a1 1 0 101.414 1.414l3-3a1 1 0 000-1.414z",
+  "clip-rule": "evenodd"
+}, null, -1
+/* HOISTED */
+);
+
+var _hoisted_4 = {
+  key: 1,
+  xmlns: "http://www.w3.org/2000/svg",
+  "class": "h-10 w-10",
+  viewBox: "0 0 20 20",
+  fill: "currentColor"
+};
+
+var _hoisted_5 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("path", {
+  "fill-rule": "evenodd",
+  d: "M10 18a8 8 0 100-16 8 8 0 000 16zM8 7a1 1 0 00-1 1v4a1 1 0 001 1h4a1 1 0 001-1V8a1 1 0 00-1-1H8z",
+  "clip-rule": "evenodd"
+}, null, -1
+/* HOISTED */
+);
 
 (0,vue__WEBPACK_IMPORTED_MODULE_0__.popScopeId)();
 
 var render = /*#__PURE__*/_withId(function (_ctx, _cache, $props, $setup, $data, $options) {
   return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)("div", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", {
-    "class": [$options.extraClassName, "h-full w-full "],
-    draggable: "true"
-  }, null, 2
-  /* CLASS */
+    "class": [$options.extraClassName, "flex justify-center items-center h-full w-full"],
+    onMouseenter: _cache[1] || (_cache[1] = function () {
+      return $options.onMouseEnter && $options.onMouseEnter.apply($options, arguments);
+    }),
+    onMousedown: _cache[2] || (_cache[2] = function () {
+      return $options.onMouseDown && $options.onMouseDown.apply($options, arguments);
+    }),
+    onMouseup: _cache[3] || (_cache[3] = function () {
+      return $options.onMouseUp && $options.onMouseUp.apply($options, arguments);
+    })
+  }, [$props.isStart ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)("svg", _hoisted_2, [_hoisted_3])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $props.isFinish ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)("svg", _hoisted_4, [_hoisted_5])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)], 34
+  /* CLASS, HYDRATE_EVENTS */
   )]);
 });
 
@@ -18402,25 +18541,28 @@ var _hoisted_2 = {
 var render = /*#__PURE__*/_withId(function (_ctx, _cache, $props, $setup, $data, $options) {
   var _component_Node = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("Node");
 
-  return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, [_hoisted_1, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_2, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.nodes, function (item) {
+  return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, [_hoisted_1, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_2, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.grid, function (item) {
     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)("div", {
       "class": "flex justify-center text-white",
       key: item.row
     }, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)(item, function (node) {
       return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)("div", {
-        "class": "flex border  text-white ",
+        "class": "flex border text-white",
         style: {
-          "width": "4rem",
-          "height": "4rem"
+          "width": "3rem",
+          "height": "3rem"
         },
         key: node.col
       }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_Node, {
         value: node,
         isStart: node.isStart,
-        isFinish: node.isFinish
+        isFinish: node.isFinish,
+        onOnMouseEnter: $options.handleMouseEnter,
+        onOnMouseUp: $options.handleMouseUp,
+        onOnMouseDown: $options.handleMouseDown
       }, null, 8
       /* PROPS */
-      , ["value", "isStart", "isFinish"])]);
+      , ["value", "isStart", "isFinish", "onOnMouseEnter", "onOnMouseUp", "onOnMouseDown"])]);
     }), 128
     /* KEYED_FRAGMENT */
     ))]);
@@ -18961,7 +19103,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.startCls[data-v-8d6b5524]{\n    background-color: greenyellow;\n    color: yellow;\n    cursor: -webkit-grabbing;\n    cursor: grabbing;\n}\n.endCls[data-v-8d6b5524]{\n    background-color: red;\n    color: yellow;\n    cursor: -webkit-grabbing;\n    cursor: grabbing;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.startCls[data-v-8d6b5524] {\n  color: yellow;\n  cursor: -webkit-grabbing;\n  cursor: grabbing;\n  -webkit-animation: strClr-8d6b5524 3s;\n          animation: strClr-8d6b5524 3s;\n}\n@-webkit-keyframes strClr-8d6b5524 {\nfrom {\n    color: white;\n}\nto {\n    color: yellow;\n}\n}\n@keyframes strClr-8d6b5524 {\nfrom {\n    color: white;\n}\nto {\n    color: yellow;\n}\n}\n.endCls[data-v-8d6b5524] {\n  color: red;\n  cursor: -webkit-grabbing;\n  cursor: grabbing;\n  -webkit-animation: endClr-8d6b5524 3s;\n          animation: endClr-8d6b5524 3s;\n}\n@-webkit-keyframes endClr-8d6b5524 {\nfrom {\n    color: white;\n}\nto {\n    color: red;\n}\n}\n@keyframes endClr-8d6b5524 {\nfrom {\n    color: white;\n}\nto {\n    color: red;\n}\n}\n.wall[data-v-8d6b5524] {\n  background-color: #ff4c29;\n  cursor: -webkit-grabbing;\n  cursor: grabbing;\n  -webkit-animation: wallColor-8d6b5524 3s;\n          animation: wallColor-8d6b5524 3s;\n}\n@-webkit-keyframes wallColor-8d6b5524 {\nfrom {\n    background-color: blue;\n}\nto {\n    background-color: #ff4c29;\n}\n}\n@keyframes wallColor-8d6b5524 {\nfrom {\n    background-color: blue;\n}\nto {\n    background-color: #ff4c29;\n}\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
