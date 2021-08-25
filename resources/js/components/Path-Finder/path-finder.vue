@@ -1,6 +1,7 @@
 <template>
-  <h1 class="text-white text-center">path finder</h1>
-
+  <h1 class="text-white text-center">Path finder</h1>
+  <button @click="dijkstra()">Dijkstra</button>
+  {{ mouseIsPressed }}
   <div class="mt-20">
     <div
       class="flex justify-center text-white"
@@ -29,6 +30,9 @@
 <script>
 import util from "util";
 import Node from "./node";
+import * as Algortithm from "../Algorithms/PathFinderAlgo";
+// import store from "../pathfinderStore";
+import { reactive, inject, ref, readonly, computed, onMounted } from "vue";
 
 export default {
   name: "path-finder",
@@ -36,34 +40,59 @@ export default {
   components: {
     Node,
   },
-  data() {
+  setup: () => {
+    const store = inject("pathfinderStore");
+    const grid = computed({
+      get() {
+        return store.state.grid;
+      },
+      set(val) {
+        store.methods.setGrid(val);
+      },
+    });
+
+    const mouseIsPressed = ref(false);
+    const movingNodes = ref(false);
+    const movingNodeType = ref("");
+    const changeNode = ref(false);
+    const previousNode = ref(null);
+    const startNode = ref({ row: 8, col: 3 });
+    const endNode = ref({ row: 8, col: 20 });
     return {
+      grid,
+      store,
       tableCol: 25,
       tableRow: 15,
-      grid: [],
-      startNode: { row: 8, col: 3 },
-      endNode: { row: 8, col: 20 },
-      mouseIsPressed: false,
-      movingNodes: false,
-      movingNodeType: "",
-      changeNode: false,
+      startNode,
+      endNode,
+      mouseIsPressed,
+      movingNodes,
+      movingNodeType,
+      changeNode,
+      makeTable,
+      createNode,
+      getNewGridWithWallToggled,
+      handleMouseEnter,
+      handleMouseDown,
+      handleMouseUp,
+      dijkstra,
+      animateDijkstra,
     };
-  },
-  watch: {},
-  computed: {},
 
-  methods: {
-    makeTable() {
+    function makeTable() {
+      const currentGrid = [];
       for (let row = 0; row < this.tableRow; row++) {
         const currentRow = [];
         for (let col = 0; col < this.tableCol; col++) {
           let currentNode = this.createNode(row, col);
           currentRow.push(currentNode);
         }
-        this.grid.push(currentRow);
+        currentGrid.push(currentRow);
       }
-    },
-    createNode(row, col) {
+
+      this.grid = currentGrid;
+    }
+    function createNode(row, col) {
       return {
         col,
         row,
@@ -74,36 +103,36 @@ export default {
         isWall: false,
         previousNode: null,
       };
-    },
-    getNewGridWithWallToggled(grid, values) {
+    }
+    function getNewGridWithWallToggled(grid, values) {
       const newGrid = grid.slice();
       const node = newGrid[values.row][values.col];
 
-      if (!this.movingNodes) {
+      if (!movingNodes.value) {
         const newNode = {
           ...node,
           isWall: !node.isWall,
         };
         newGrid[values.row][values.col] = newNode;
       } else {
-        if (this.movingNodeType == "startNode") {
+        if (movingNodeType.value == "startNode") {
           const newNode = {
             ...node,
             isStart: true,
           };
-          if (this.changeNode) {
+          if (changeNode.value) {
             const prvNode =
-              newGrid[this.previousNode.row][this.previousNode.col];
+              newGrid[previousNode.value.row][previousNode.value.col];
             const prvNodeUpdate = {
               ...prvNode,
               isStart: !prvNode.isStart,
               //   isWall: false,
             };
-            newGrid[this.previousNode.row][
-              this.previousNode.col
+            newGrid[previousNode.value.row][
+              previousNode.value.col
             ] = prvNodeUpdate;
-            this.previousNode = values;
-            this.startNode = newNode;
+            previousNode.value = values;
+            startNode.value = newNode;
           }
           newGrid[values.row][values.col] = newNode;
         } else {
@@ -111,64 +140,93 @@ export default {
             ...node,
             isFinish: true,
           };
-          if (this.changeNode) {
+          if (changeNode.value) {
             const prvNode =
-              newGrid[this.previousNode.row][this.previousNode.col];
+              newGrid[previousNode.value.row][previousNode.value.col];
             const prvNodeUpdate = {
               ...prvNode,
               isFinish: !prvNode.isFinish,
               //   isWall:(prvNode.isWall) ?  false ,
             };
-            newGrid[this.previousNode.row][
-              this.previousNode.col
+            newGrid[previousNode.value.row][
+              previousNode.value.col
             ] = prvNodeUpdate;
-            this.previousNode = values;
-            this.endNode = newNode;
+            previousNode.value = values;
+            endNode.value = newNode;
           }
           newGrid[values.row][values.col] = newNode;
         }
       }
 
       return newGrid;
-    },
-    handleMouseEnter(values) {
-      if (!this.mouseIsPressed) return;
-      if (this.previousNode) {
-        this.changeNode = true;
+    }
+    function handleMouseEnter(values) {
+      if (!mouseIsPressed.value) return;
+      if (previousNode.value) {
+        changeNode.value = true;
       }
-      const newGrid = this.getNewGridWithWallToggled(this.grid, values);
-      this.grid = newGrid;
-    },
+      const newGrid = getNewGridWithWallToggled(store.state.grid, values);
+      store.methods.setGrid(newGrid);
+    }
 
-    handleMouseDown(values) {
-      //   debugger;
-      this.mouseIsPressed = true;
+    function handleMouseDown(values) {
+      mouseIsPressed.value = true;
+
       if (
-        (this.startNode.row == values.row &&
-          this.startNode.col == values.col) ||
-        (this.endNode.row == values.row && this.endNode.col == values.col)
+        (startNode.value.row == values.row &&
+          startNode.value.col == values.col) ||
+        (endNode.value.row == values.row && endNode.value.col == values.col)
       ) {
-        this.movingNodeType =
-          this.startNode.row == values.row && this.startNode.col == values.col
+        movingNodeType.value =
+          startNode.value.row == values.row && startNode.value.col == values.col
             ? "startNode"
             : "endNode";
 
-        this.movingNodes = true;
-        this.previousNode = values;
+        movingNodes.value = true;
+        previousNode.value = values;
       }
-      const newGrid = this.getNewGridWithWallToggled(this.grid, values);
-      this.grid = newGrid;
-    },
-    handleMouseUp(values) {
-      this.mouseIsPressed = false;
-      this.movingNodes = false;
-      this.previousNode = null;
-    },
+      const newGrid = getNewGridWithWallToggled(store.state.grid, values);
+      // grid = newGrid;
+      store.methods.setGrid(newGrid);
+    }
+    function handleMouseUp(values) {
+      mouseIsPressed.value = false;
+      movingNodes.value = false;
+      previousNode.value = null;
+    }
+    function dijkstra() {
+      const startNode =
+        store.state.grid[this.startNode.row][this.startNode.col];
+      const endNode = store.state.grid[this.endNode.row][this.endNode.col];
+      let s = store.state.grid;
+      const visitedNodes = Algortithm.dijkstra(s, startNode, endNode);
+      this.animateDijkstra(visitedNodes);
+    }
+    function animateDijkstra(visitedNodesInOrder) {
+      for (let i = 0; i < visitedNodesInOrder.length; i++) {
+        setTimeout(() => {
+          const node = visitedNodesInOrder[i];
+
+          const newGrid = state.grid.slice();
+          const newNode = {
+            ...node,
+            isVisited: true,
+          };
+          newGrid[node.row][node.col] = newNode;
+          grid = newGrid;
+        }, 100 * i);
+      }
+    }
   },
-  mounted() {
+
+  watch: {},
+  computed: {},
+
+  methods: {},
+  mounted() {},
+  created() {
     this.makeTable();
   },
-  created() {},
 };
 </script>
 

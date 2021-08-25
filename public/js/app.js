@@ -17974,8 +17974,9 @@ __webpack_require__.r(__webpack_exports__);
       var _this$value = this.value,
           isStart = _this$value.isStart,
           isFinish = _this$value.isFinish,
-          isWall = _this$value.isWall;
-      var cn = isFinish == true ? "endCls" : isStart == true ? "startCls" : isWall == true ? "wall" : "";
+          isWall = _this$value.isWall,
+          isVisited = _this$value.isVisited;
+      var cn = isFinish == true ? "endCls" : isStart == true ? "startCls" : isWall == true ? "wall" : isVisited == true ? "nodeVisited" : "";
       return cn;
     },
     onMouseEnter: function onMouseEnter() {
@@ -18008,12 +18009,19 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var util__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! util */ "./node_modules/util/util.js");
 /* harmony import */ var util__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(util__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _node__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./node */ "./resources/js/components/Path-Finder/node.vue");
+/* harmony import */ var _Algorithms_PathFinderAlgo__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../Algorithms/PathFinderAlgo */ "./resources/js/components/Algorithms/PathFinderAlgo.js");
+/* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.esm-bundler.js");
 function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) { symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); } keys.push.apply(keys, symbols); } return keys; }
 
 function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
+function _readOnlyError(name) { throw new TypeError("\"" + name + "\" is read-only"); }
+
+
+
+ // import store from "../pathfinderStore";
 
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
@@ -18022,29 +18030,53 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
   components: {
     Node: _node__WEBPACK_IMPORTED_MODULE_1__.default
   },
-  data: function data() {
+  setup: function setup() {
+    var store = (0,vue__WEBPACK_IMPORTED_MODULE_3__.inject)("pathfinderStore");
+    var grid = (0,vue__WEBPACK_IMPORTED_MODULE_3__.computed)({
+      get: function get() {
+        return store.state.grid;
+      },
+      set: function set(val) {
+        store.methods.setGrid(val);
+      }
+    });
+    var mouseIsPressed = (0,vue__WEBPACK_IMPORTED_MODULE_3__.ref)(false);
+    var movingNodes = (0,vue__WEBPACK_IMPORTED_MODULE_3__.ref)(false);
+    var movingNodeType = (0,vue__WEBPACK_IMPORTED_MODULE_3__.ref)("");
+    var changeNode = (0,vue__WEBPACK_IMPORTED_MODULE_3__.ref)(false);
+    var previousNode = (0,vue__WEBPACK_IMPORTED_MODULE_3__.ref)(null);
+    var startNode = (0,vue__WEBPACK_IMPORTED_MODULE_3__.ref)({
+      row: 8,
+      col: 3
+    });
+    var endNode = (0,vue__WEBPACK_IMPORTED_MODULE_3__.ref)({
+      row: 8,
+      col: 20
+    });
     return {
+      grid: grid,
+      store: store,
       tableCol: 25,
       tableRow: 15,
-      grid: [],
-      startNode: {
-        row: 8,
-        col: 3
-      },
-      endNode: {
-        row: 8,
-        col: 20
-      },
-      mouseIsPressed: false,
-      movingNodes: false,
-      movingNodeType: "",
-      changeNode: false
+      startNode: startNode,
+      endNode: endNode,
+      mouseIsPressed: mouseIsPressed,
+      movingNodes: movingNodes,
+      movingNodeType: movingNodeType,
+      changeNode: changeNode,
+      makeTable: makeTable,
+      createNode: createNode,
+      getNewGridWithWallToggled: getNewGridWithWallToggled,
+      handleMouseEnter: handleMouseEnter,
+      handleMouseDown: handleMouseDown,
+      handleMouseUp: handleMouseUp,
+      dijkstra: dijkstra,
+      animateDijkstra: animateDijkstra
     };
-  },
-  watch: {},
-  computed: {},
-  methods: {
-    makeTable: function makeTable() {
+
+    function makeTable() {
+      var currentGrid = [];
+
       for (var row = 0; row < this.tableRow; row++) {
         var currentRow = [];
 
@@ -18053,10 +18085,13 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
           currentRow.push(currentNode);
         }
 
-        this.grid.push(currentRow);
+        currentGrid.push(currentRow);
       }
-    },
-    createNode: function createNode(row, col) {
+
+      this.grid = currentGrid;
+    }
+
+    function createNode(row, col) {
       return {
         col: col,
         row: row,
@@ -18067,34 +18102,35 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         isWall: false,
         previousNode: null
       };
-    },
-    getNewGridWithWallToggled: function getNewGridWithWallToggled(grid, values) {
+    }
+
+    function getNewGridWithWallToggled(grid, values) {
       var newGrid = grid.slice();
       var node = newGrid[values.row][values.col];
 
-      if (!this.movingNodes) {
+      if (!movingNodes.value) {
         var newNode = _objectSpread(_objectSpread({}, node), {}, {
           isWall: !node.isWall
         });
 
         newGrid[values.row][values.col] = newNode;
       } else {
-        if (this.movingNodeType == "startNode") {
+        if (movingNodeType.value == "startNode") {
           var _newNode = _objectSpread(_objectSpread({}, node), {}, {
             isStart: true
           });
 
-          if (this.changeNode) {
-            var prvNode = newGrid[this.previousNode.row][this.previousNode.col];
+          if (changeNode.value) {
+            var prvNode = newGrid[previousNode.value.row][previousNode.value.col];
 
             var prvNodeUpdate = _objectSpread(_objectSpread({}, prvNode), {}, {
               isStart: !prvNode.isStart //   isWall: false,
 
             });
 
-            newGrid[this.previousNode.row][this.previousNode.col] = prvNodeUpdate;
-            this.previousNode = values;
-            this.startNode = _newNode;
+            newGrid[previousNode.value.row][previousNode.value.col] = prvNodeUpdate;
+            previousNode.value = values;
+            startNode.value = _newNode;
           }
 
           newGrid[values.row][values.col] = _newNode;
@@ -18103,17 +18139,17 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
             isFinish: true
           });
 
-          if (this.changeNode) {
-            var _prvNode = newGrid[this.previousNode.row][this.previousNode.col];
+          if (changeNode.value) {
+            var _prvNode = newGrid[previousNode.value.row][previousNode.value.col];
 
             var _prvNodeUpdate = _objectSpread(_objectSpread({}, _prvNode), {}, {
               isFinish: !_prvNode.isFinish //   isWall:(prvNode.isWall) ?  false ,
 
             });
 
-            newGrid[this.previousNode.row][this.previousNode.col] = _prvNodeUpdate;
-            this.previousNode = values;
-            this.endNode = _newNode2;
+            newGrid[previousNode.value.row][previousNode.value.col] = _prvNodeUpdate;
+            previousNode.value = values;
+            endNode.value = _newNode2;
           }
 
           newGrid[values.row][values.col] = _newNode2;
@@ -18121,40 +18157,74 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       }
 
       return newGrid;
-    },
-    handleMouseEnter: function handleMouseEnter(values) {
-      if (!this.mouseIsPressed) return;
+    }
 
-      if (this.previousNode) {
-        this.changeNode = true;
+    function handleMouseEnter(values) {
+      if (!mouseIsPressed.value) return;
+
+      if (previousNode.value) {
+        changeNode.value = true;
       }
 
-      var newGrid = this.getNewGridWithWallToggled(this.grid, values);
-      this.grid = newGrid;
-    },
-    handleMouseDown: function handleMouseDown(values) {
-      //   debugger;
-      this.mouseIsPressed = true;
+      var newGrid = getNewGridWithWallToggled(store.state.grid, values);
+      store.methods.setGrid(newGrid);
+    }
 
-      if (this.startNode.row == values.row && this.startNode.col == values.col || this.endNode.row == values.row && this.endNode.col == values.col) {
-        this.movingNodeType = this.startNode.row == values.row && this.startNode.col == values.col ? "startNode" : "endNode";
-        this.movingNodes = true;
-        this.previousNode = values;
+    function handleMouseDown(values) {
+      mouseIsPressed.value = true;
+
+      if (startNode.value.row == values.row && startNode.value.col == values.col || endNode.value.row == values.row && endNode.value.col == values.col) {
+        movingNodeType.value = startNode.value.row == values.row && startNode.value.col == values.col ? "startNode" : "endNode";
+        movingNodes.value = true;
+        previousNode.value = values;
       }
 
-      var newGrid = this.getNewGridWithWallToggled(this.grid, values);
-      this.grid = newGrid;
-    },
-    handleMouseUp: function handleMouseUp(values) {
-      this.mouseIsPressed = false;
-      this.movingNodes = false;
-      this.previousNode = null;
+      var newGrid = getNewGridWithWallToggled(store.state.grid, values); // grid = newGrid;
+
+      store.methods.setGrid(newGrid);
+    }
+
+    function handleMouseUp(values) {
+      mouseIsPressed.value = false;
+      movingNodes.value = false;
+      previousNode.value = null;
+    }
+
+    function dijkstra() {
+      var startNode = store.state.grid[this.startNode.row][this.startNode.col];
+      var endNode = store.state.grid[this.endNode.row][this.endNode.col];
+      var s = store.state.grid;
+      var visitedNodes = _Algorithms_PathFinderAlgo__WEBPACK_IMPORTED_MODULE_2__.dijkstra(s, startNode, endNode);
+      this.animateDijkstra(visitedNodes);
+    }
+
+    function animateDijkstra(visitedNodesInOrder) {
+      var _loop = function _loop(i) {
+        setTimeout(function () {
+          var node = visitedNodesInOrder[i];
+          var newGrid = state.grid.slice();
+
+          var newNode = _objectSpread(_objectSpread({}, node), {}, {
+            isVisited: true
+          });
+
+          newGrid[node.row][node.col] = newNode;
+          newGrid, _readOnlyError("grid");
+        }, 100 * i);
+      };
+
+      for (var i = 0; i < visitedNodesInOrder.length; i++) {
+        _loop(i);
+      }
     }
   },
-  mounted: function mounted() {
+  watch: {},
+  computed: {},
+  methods: {},
+  mounted: function mounted() {},
+  created: function created() {
     this.makeTable();
-  },
-  created: function created() {}
+  }
 });
 
 /***/ }),
@@ -18172,15 +18242,17 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var _sorting_visualizer_vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./sorting-visualizer.vue */ "./resources/js/components/sorting-visualizer.vue");
 /* harmony import */ var _Path_Finder_path_finder_vue__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Path-Finder/path-finder.vue */ "./resources/js/components/Path-Finder/path-finder.vue");
+/* harmony import */ var _pathfinderStore__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./pathfinderStore */ "./resources/js/components/pathfinderStore/index.js");
+/* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.esm-bundler.js");
+
+
 
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
-  name: "base",
-  props: ['type'],
+  name: "base2",
+  props: ["type"],
   setup: function setup() {
-    return {
-      greeting: 'Hello Worddld f rom Vue 3!a'
-    };
+    (0,vue__WEBPACK_IMPORTED_MODULE_3__.provide)("pathfinderStore", _pathfinderStore__WEBPACK_IMPORTED_MODULE_2__.default);
   },
   components: {
     SortingVisualizer: _sorting_visualizer_vue__WEBPACK_IMPORTED_MODULE_0__.default,
@@ -18528,7 +18600,7 @@ var _withId = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.withScopeId)("dat
 
 var _hoisted_1 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("h1", {
   "class": "text-white text-center"
-}, "path finder", -1
+}, "Path finder", -1
 /* HOISTED */
 );
 
@@ -18541,7 +18613,13 @@ var _hoisted_2 = {
 var render = /*#__PURE__*/_withId(function (_ctx, _cache, $props, $setup, $data, $options) {
   var _component_Node = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("Node");
 
-  return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, [_hoisted_1, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_2, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.grid, function (item) {
+  return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, [_hoisted_1, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("button", {
+    onClick: _cache[1] || (_cache[1] = function ($event) {
+      return _ctx.dijkstra();
+    })
+  }, "Dijkstra"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.mouseIsPressed) + " ", 1
+  /* TEXT */
+  ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)("div", _hoisted_2, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)(_ctx.grid, function (item) {
     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)("div", {
       "class": "flex justify-center text-white",
       key: item.row
@@ -18557,9 +18635,9 @@ var render = /*#__PURE__*/_withId(function (_ctx, _cache, $props, $setup, $data,
         value: node,
         isStart: node.isStart,
         isFinish: node.isFinish,
-        onOnMouseEnter: $options.handleMouseEnter,
-        onOnMouseUp: $options.handleMouseUp,
-        onOnMouseDown: $options.handleMouseDown
+        onOnMouseEnter: _ctx.handleMouseEnter,
+        onOnMouseUp: _ctx.handleMouseUp,
+        onOnMouseDown: _ctx.handleMouseDown
       }, null, 8
       /* PROPS */
       , ["value", "isStart", "isFinish", "onOnMouseEnter", "onOnMouseUp", "onOnMouseDown"])]);
@@ -18831,7 +18909,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 var app = (0,vue__WEBPACK_IMPORTED_MODULE_0__.createApp)({});
-app.component('parent', _components_base_vue__WEBPACK_IMPORTED_MODULE_2__.default).mount('#app');
+app.component("parent", _components_base_vue__WEBPACK_IMPORTED_MODULE_2__.default).mount("#app");
 
 __webpack_require__(/*! ./bootstrap */ "./resources/js/bootstrap.js");
 
@@ -18865,6 +18943,136 @@ window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 //     cluster: process.env.MIX_PUSHER_APP_CLUSTER,
 //     forceTLS: true
 // });
+
+/***/ }),
+
+/***/ "./resources/js/components/Algorithms/PathFinderAlgo.js":
+/*!**************************************************************!*\
+  !*** ./resources/js/components/Algorithms/PathFinderAlgo.js ***!
+  \**************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "dijkstra": () => (/* binding */ dijkstra),
+/* harmony export */   "getNodesInShortestPathOrder": () => (/* binding */ getNodesInShortestPathOrder)
+/* harmony export */ });
+function _createForOfIteratorHelper(o, allowArrayLike) { var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"]; if (!it) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = it.call(o); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it["return"] != null) it["return"](); } finally { if (didErr) throw err; } } }; }
+
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+
+// Performs Dijkstra's algorithm; returns *all* nodes in the order
+// in which they were visited. Also makes nodes point back to their
+// previous node, effectively allowing us to compute the shortest path
+// by backtracking from the finish node.
+function dijkstra(grid, startNode, finishNode) {
+  debugger;
+  var visitedNodesInOrder = [];
+  startNode.distance = 0;
+  var unvisitedNodes = getAllNodes(grid);
+
+  while (!!unvisitedNodes.length) {
+    sortNodesByDistance(unvisitedNodes);
+    var closestNode = unvisitedNodes.shift(); // If we encounter a wall, we skip it.
+
+    if (closestNode.isWall) continue; // If the closest node is at a distance of infinity,
+    // we must be trapped and should therefore stop.
+
+    if (closestNode.distance === Infinity) return visitedNodesInOrder;
+    closestNode.isVisited = true;
+    visitedNodesInOrder.push(closestNode);
+    if (closestNode === finishNode) return visitedNodesInOrder;
+    updateUnvisitedNeighbors(closestNode, grid);
+  }
+}
+
+function sortNodesByDistance(unvisitedNodes) {
+  unvisitedNodes.sort(function (nodeA, nodeB) {
+    return nodeA.distance - nodeB.distance;
+  });
+}
+
+function updateUnvisitedNeighbors(node, grid) {
+  var unvisitedNeighbors = getUnvisitedNeighbors(node, grid);
+
+  var _iterator = _createForOfIteratorHelper(unvisitedNeighbors),
+      _step;
+
+  try {
+    for (_iterator.s(); !(_step = _iterator.n()).done;) {
+      var neighbor = _step.value;
+      neighbor.distance = node.distance + 1;
+      neighbor.previousNode = node;
+    }
+  } catch (err) {
+    _iterator.e(err);
+  } finally {
+    _iterator.f();
+  }
+}
+
+function getUnvisitedNeighbors(node, grid) {
+  var neighbors = [];
+  var col = node.col,
+      row = node.row;
+  if (row > 0) neighbors.push(grid[row - 1][col]);
+  if (row < grid.length - 1) neighbors.push(grid[row + 1][col]);
+  if (col > 0) neighbors.push(grid[row][col - 1]);
+  if (col < grid[0].length - 1) neighbors.push(grid[row][col + 1]);
+  return neighbors.filter(function (neighbor) {
+    return !neighbor.isVisited;
+  });
+}
+
+function getAllNodes(grid) {
+  var nodes = [];
+
+  var _iterator2 = _createForOfIteratorHelper(grid),
+      _step2;
+
+  try {
+    for (_iterator2.s(); !(_step2 = _iterator2.n()).done;) {
+      var row = _step2.value;
+
+      var _iterator3 = _createForOfIteratorHelper(row),
+          _step3;
+
+      try {
+        for (_iterator3.s(); !(_step3 = _iterator3.n()).done;) {
+          var node = _step3.value;
+          nodes.push(node);
+        }
+      } catch (err) {
+        _iterator3.e(err);
+      } finally {
+        _iterator3.f();
+      }
+    }
+  } catch (err) {
+    _iterator2.e(err);
+  } finally {
+    _iterator2.f();
+  }
+
+  return nodes;
+} // Backtracks from the finishNode to find the shortest path.
+// Only works when called *after* the dijkstra method above.
+
+
+function getNodesInShortestPathOrder(finishNode) {
+  var nodesInShortestPathOrder = [];
+  var currentNode = finishNode;
+
+  while (currentNode !== null) {
+    nodesInShortestPathOrder.unshift(currentNode);
+    currentNode = currentNode.previousNode;
+  }
+
+  return nodesInShortestPathOrder;
+}
 
 /***/ }),
 
@@ -19086,6 +19294,34 @@ function swapSelectionSort(startIdx, currentSmallestIdx, array, animations) {
 
 /***/ }),
 
+/***/ "./resources/js/components/pathfinderStore/index.js":
+/*!**********************************************************!*\
+  !*** ./resources/js/components/pathfinderStore/index.js ***!
+  \**********************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.esm-bundler.js");
+
+var state = (0,vue__WEBPACK_IMPORTED_MODULE_0__.reactive)({
+  grid: []
+});
+var methods = {
+  setGrid: function setGrid(val) {
+    state.grid = val;
+  }
+};
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
+  state: (0,vue__WEBPACK_IMPORTED_MODULE_0__.readonly)(state),
+  methods: methods
+});
+
+/***/ }),
+
 /***/ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/Path-Finder/node.vue?vue&type=style&index=0&id=8d6b5524&scoped=true&lang=css":
 /*!***********************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
   !*** ./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/Path-Finder/node.vue?vue&type=style&index=0&id=8d6b5524&scoped=true&lang=css ***!
@@ -19103,7 +19339,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.startCls[data-v-8d6b5524] {\n  color: yellow;\n  cursor: -webkit-grabbing;\n  cursor: grabbing;\n  -webkit-animation: strClr-8d6b5524 3s;\n          animation: strClr-8d6b5524 3s;\n}\n@-webkit-keyframes strClr-8d6b5524 {\nfrom {\n    color: white;\n}\nto {\n    color: yellow;\n}\n}\n@keyframes strClr-8d6b5524 {\nfrom {\n    color: white;\n}\nto {\n    color: yellow;\n}\n}\n.endCls[data-v-8d6b5524] {\n  color: red;\n  cursor: -webkit-grabbing;\n  cursor: grabbing;\n  -webkit-animation: endClr-8d6b5524 3s;\n          animation: endClr-8d6b5524 3s;\n}\n@-webkit-keyframes endClr-8d6b5524 {\nfrom {\n    color: white;\n}\nto {\n    color: red;\n}\n}\n@keyframes endClr-8d6b5524 {\nfrom {\n    color: white;\n}\nto {\n    color: red;\n}\n}\n.wall[data-v-8d6b5524] {\n  background-color: #ff4c29;\n  cursor: -webkit-grabbing;\n  cursor: grabbing;\n  -webkit-animation: wallColor-8d6b5524 3s;\n          animation: wallColor-8d6b5524 3s;\n}\n@-webkit-keyframes wallColor-8d6b5524 {\nfrom {\n    background-color: blue;\n}\nto {\n    background-color: #ff4c29;\n}\n}\n@keyframes wallColor-8d6b5524 {\nfrom {\n    background-color: blue;\n}\nto {\n    background-color: #ff4c29;\n}\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.startCls[data-v-8d6b5524] {\n  color: yellow;\n  cursor: -webkit-grabbing;\n  cursor: grabbing;\n  -webkit-animation: strClr-8d6b5524 3s;\n          animation: strClr-8d6b5524 3s;\n}\n@-webkit-keyframes strClr-8d6b5524 {\nfrom {\n    color: white;\n}\nto {\n    color: yellow;\n}\n}\n@keyframes strClr-8d6b5524 {\nfrom {\n    color: white;\n}\nto {\n    color: yellow;\n}\n}\n.endCls[data-v-8d6b5524] {\n  color: red;\n  cursor: -webkit-grabbing;\n  cursor: grabbing;\n  -webkit-animation: endClr-8d6b5524 3s;\n          animation: endClr-8d6b5524 3s;\n}\n@-webkit-keyframes endClr-8d6b5524 {\nfrom {\n    color: white;\n}\nto {\n    color: red;\n}\n}\n@keyframes endClr-8d6b5524 {\nfrom {\n    color: white;\n}\nto {\n    color: red;\n}\n}\n.wall[data-v-8d6b5524] {\n  background-color: #ff4c29;\n  cursor: -webkit-grabbing;\n  cursor: grabbing;\n  -webkit-animation: wallColor-8d6b5524 3s;\n          animation: wallColor-8d6b5524 3s;\n}\n@-webkit-keyframes wallColor-8d6b5524 {\nfrom {\n    background-color: blue;\n}\nto {\n    background-color: #ff4c29;\n}\n}\n@keyframes wallColor-8d6b5524 {\nfrom {\n    background-color: blue;\n}\nto {\n    background-color: #ff4c29;\n}\n}\n.nodeVisited[data-v-8d6b5524] {\n  background-color: yellow;\n  cursor: -webkit-grabbing;\n  cursor: grabbing;\n  -webkit-animation: isv-8d6b5524 3s;\n          animation: isv-8d6b5524 3s;\n}\n@-webkit-keyframes isv-8d6b5524 {\nfrom {\n    background-color: red;\n}\nto {\n    background-color: yellow;\n}\n}\n@keyframes isv-8d6b5524 {\nfrom {\n    background-color: red;\n}\nto {\n    background-color: yellow;\n}\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 

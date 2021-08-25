@@ -54,7 +54,7 @@ export default {
   watch: {},
   computed: {
     extraClassName() {
-      const { isStart, isFinish, isWall } = this.value;
+      const { isStart, isFinish, isWall, isVisited } = this.value;
 
       const cn =
         isFinish == true
@@ -63,6 +63,8 @@ export default {
           ? "startCls"
           : isWall == true
           ? "wall"
+          : isVisited == true
+          ? "nodeVisited"
           : "";
 
       return cn;
@@ -124,6 +126,20 @@ export default {
   }
   to {
     background-color: #ff4c29;
+  }
+}
+.nodeVisited {
+  background-color: yellow;
+  cursor: grabbing;
+  animation: isv 3s;
+}
+
+@keyframes isv {
+  from {
+    background-color: red;
+  }
+  to {
+    background-color: yellow;
   }
 }
 </style>
