@@ -1,8 +1,8 @@
 import { reactive, readonly, ssrContextKey } from "vue";
 
-const state = reactive({
+const state = {
     grid: [],
-});
+};
 const methods = {
     setGrid(val) {
         state.grid = val;
@@ -10,6 +10,6 @@ const methods = {
 };
 
 export default {
-    state: readonly(state),
+    state: state,
     methods,
 };

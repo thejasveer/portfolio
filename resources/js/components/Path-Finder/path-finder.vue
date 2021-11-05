@@ -1,7 +1,6 @@
 <template>
   <h1 class="text-white text-center">Path finder</h1>
   <button @click="dijkstra()">Dijkstra</button>
-  {{ mouseIsPressed }}
   <div class="mt-20">
     <div
       class="flex justify-center text-white"
@@ -10,7 +9,7 @@
     >
       <div
         class="flex border text-white"
-        style="width: 3rem; height: 3rem"
+        style="width: 2rem; height: 2rem"
         v-for="node in item"
         :key="node.col"
       >
@@ -18,6 +17,7 @@
           :value="node"
           :isStart="node.isStart"
           :isFinish="node.isFinish"
+         
           @onMouseEnter="handleMouseEnter"
           @onMouseUp="handleMouseUp"
           @onMouseDown="handleMouseDown"
@@ -42,15 +42,8 @@ export default {
   },
   setup: () => {
     const store = inject("pathfinderStore");
-    const grid = computed({
-      get() {
-        return store.state.grid;
-      },
-      set(val) {
-        store.methods.setGrid(val);
-      },
-    });
 
+    let grid = ref([]);
     const mouseIsPressed = ref(false);
     const movingNodes = ref(false);
     const movingNodeType = ref("");
@@ -58,11 +51,13 @@ export default {
     const previousNode = ref(null);
     const startNode = ref({ row: 8, col: 3 });
     const endNode = ref({ row: 8, col: 20 });
+    let sp = ref(false);
     return {
       grid,
       store,
-      tableCol: 25,
-      tableRow: 15,
+      sp,
+      tableCol: 50,
+      tableRow: 25,
       startNode,
       endNode,
       mouseIsPressed,
@@ -90,7 +85,7 @@ export default {
         currentGrid.push(currentRow);
       }
 
-      this.grid = currentGrid;
+      grid.value = currentGrid;
     }
     function createNode(row, col) {
       return {
@@ -165,8 +160,8 @@ export default {
       if (previousNode.value) {
         changeNode.value = true;
       }
-      const newGrid = getNewGridWithWallToggled(store.state.grid, values);
-      store.methods.setGrid(newGrid);
+      const newGrid = getNewGridWithWallToggled(grid.value, values);
+      grid.value = newGrid;
     }
 
     function handleMouseDown(values) {
@@ -185,36 +180,66 @@ export default {
         movingNodes.value = true;
         previousNode.value = values;
       }
-      const newGrid = getNewGridWithWallToggled(store.state.grid, values);
+      const newGrid = getNewGridWithWallToggled(grid.value, values);
       // grid = newGrid;
-      store.methods.setGrid(newGrid);
+      grid.value = newGrid;
     }
     function handleMouseUp(values) {
       mouseIsPressed.value = false;
       movingNodes.value = false;
       previousNode.value = null;
     }
-    function dijkstra() {
-      const startNode =
-        store.state.grid[this.startNode.row][this.startNode.col];
-      const endNode = store.state.grid[this.endNode.row][this.endNode.col];
-      let s = store.state.grid;
-      const visitedNodes = Algortithm.dijkstra(s, startNode, endNode);
-      this.animateDijkstra(visitedNodes);
+    async function dijkstra() {
+      let gridCopy = copyArray(grid.value);
+      const startNode = gridCopy[this.startNode.row][this.startNode.col];
+      const endNode = gridCopy[this.endNode.row][this.endNode.col];
+      const visitedNodes = Algortithm.dijkstra(gridCopy, startNode, endNode);
+      animateDijkstra(visitedNodes);
     }
+    function animateShortestPath(shortestPath) {
+      for (let i = 0; i < shortestPath.length; i++) {
+        setTimeout(() => {
+          let id = "node_" + shortestPath[i].row + "_" + shortestPath[i].col;
+          document.getElementById(id).classList.add("shortestPath");
+        }, 100 * i);
+      }
+    }
+
+    function copyArray(o) {
+      {
+        var output, v, key;
+        output = Array.isArray(o) ? [] : {};
+        for (key in o) {
+          v = o[key];
+          output[key] = typeof v === "object" ? copyArray(v) : v;
+        }
+        return output;
+      }
+    }
+
     function animateDijkstra(visitedNodesInOrder) {
       for (let i = 0; i < visitedNodesInOrder.length; i++) {
         setTimeout(() => {
           const node = visitedNodesInOrder[i];
-
-          const newGrid = state.grid.slice();
+          const newGrid = grid.value;
           const newNode = {
             ...node,
             isVisited: true,
           };
           newGrid[node.row][node.col] = newNode;
-          grid = newGrid;
+          grid.value = newGrid;
         }, 100 * i);
+
+        let j = visitedNodesInOrder.length - 1;
+        if (i == j && visitedNodesInOrder[i].isFinish == true) {
+          setTimeout(() => {
+            let shortestPath = Algortithm.getNodesInShortestPathOrder(
+              visitedNodesInOrder[i]
+            );
+            animateShortestPath(shortestPath);
+          }, 100 * i);
+          // sp = true;
+        }
       }
     }
   },
@@ -230,5 +255,4 @@ export default {
 };
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>

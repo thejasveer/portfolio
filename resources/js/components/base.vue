@@ -5,22 +5,20 @@
 </template>
 
 <script>
-import SortingVisualizer from "./sorting-visualizer.vue";
+import SortingVisualizer from "./Sorting-Visualizer/sorting-visualizer.vue";
 import PathFinder from "./Path-Finder/path-finder.vue";
 import pathfinderStore from "./pathfinderStore";
 import { provide } from "vue";
 export default {
   name: "base2",
   props: ["type"],
-  setup() {
-    provide("pathfinderStore", pathfinderStore);
-  },
+
   components: {
     SortingVisualizer,
     PathFinder,
   },
 };
 </script>
-
+ 
 <style scoped>
 </style>

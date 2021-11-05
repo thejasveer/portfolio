@@ -6,6 +6,7 @@
       @mousedown="onMouseDown"
       v-on:mouseup="onMouseUp"
       class="flex justify-center items-center h-full w-full"
+      :id="'node_' + value.row + '_' + value.col"
     >
       <svg
         v-if="isStart"
@@ -20,6 +21,7 @@
           clip-rule="evenodd"
         />
       </svg>
+      <!-- <img v-if="isStart" src="/public/assets/finder.gif" alt="" /> -->
       <svg
         v-if="isFinish"
         xmlns="http://www.w3.org/2000/svg"
@@ -51,7 +53,11 @@ export default {
       // nodesArray:this.tableNodes
     };
   },
-  watch: {},
+  watch: {
+    value(neww, pre) {
+      // console.log(neww);
+    },
+  },
   computed: {
     extraClassName() {
       const { isStart, isFinish, isWall, isVisited } = this.value;
@@ -81,7 +87,9 @@ export default {
   },
 
   methods: {},
-  mounted() {},
+  mounted() {
+    // console.log(this.value);
+  },
 };
 </script>
 
@@ -140,6 +148,19 @@ export default {
   }
   to {
     background-color: yellow;
+  }
+}
+.shortestPath {
+  background-color: black;
+  cursor: grabbing;
+  animation: sp 2s;
+}
+@keyframes sp {
+  from {
+    background-color: blue;
+  }
+  to {
+    background-color: purple;
   }
 }
 </style>
