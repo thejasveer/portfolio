@@ -1,6 +1,9 @@
 <template>
   <h1 class="text-white text-center">Path finder</h1>
-  <button @click="dijkstra()">Dijkstra</button>
+  <div class="flex justify-center">
+    <button class="bg-white rounded-md p-5" @click="dijkstra()">Find Shortest path</button>
+  </div>
+ 
   <div class="mt-20">
     <div
       class="flex justify-center text-white"

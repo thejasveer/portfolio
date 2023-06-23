@@ -1,5 +1,5 @@
 <template>
-  <a href="/" class="text-white">Back</a>
+  <!-- <a href="/" class="text-white">Back</a> -->
   <sorting-visualizer v-if="type == 'SortingVisualizer'" />
   <path-finder v-else />
 </template>
