@@ -28,6 +28,7 @@
         @yield('content')
         <div class="relative flex flex-col items-top justify-center min-h-screen bg-gray-100 sm:items-center py-4 sm:pt-0">
 
+            <a target="_blank" href="https://swiggy.wdd12-jasveer.xyz/">Sorting Visulaizer</a>
             <a target="_blank" href="/sorting-visualizer">Sorting Visulaizer</a>
             <a target="_blank" href="/path-finder">Path Finder</a>
             <a target="_blank" href="http://linkedin.wdd12-jasveer.xyz/">Linkedin Clone</a>
