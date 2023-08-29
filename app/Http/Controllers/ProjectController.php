@@ -13,3 +13,4 @@ class ProjectController extends Controller
         return view('Projects.Path-Finder');
     }
 }
+
