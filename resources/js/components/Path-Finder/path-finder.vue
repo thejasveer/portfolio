@@ -2,7 +2,9 @@
   <h1 class="text-white text-center">Path finder</h1>
   <div class="flex justify-center">
     <button class="bg-white rounded-md p-5" @click="dijkstra()">Find Shortest path</button>
+
   </div>
+  <p>You can create walls by selecting multi</p>
  
   <div class="mt-20">
     <div
@@ -20,7 +22,6 @@
           :value="node"
           :isStart="node.isStart"
           :isFinish="node.isFinish"
-         
           @onMouseEnter="handleMouseEnter"
           @onMouseUp="handleMouseUp"
           @onMouseDown="handleMouseDown"

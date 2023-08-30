@@ -1,4 +1,4 @@
 @extends('layouts.base')
-@section('content')
+@section('vue-content')
     <parent type="pathFinder" />
 @stop
